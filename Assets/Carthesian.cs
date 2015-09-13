@@ -26,11 +26,11 @@ public class Cartesian{
 			else y = value;
 		}
 	}
-	public void ToUnits(out double ab, out double ord){
+	public void ToUnits(out float ab, out float ord){
 		ab = this.x*20;
 		ord = this.y*20;
 	}
-	public static Cartesian FromUnits(double ab, double ord){
+	public static Cartesian FromUnits(float ab, float ord){
 		return new Cartesian ((int) ab / 20, (int) ord / 20);
 	}
 }
