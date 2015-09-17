@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour {
 	public Transform OverviewCamera;
 
 	//for Sensetivity scrolls = 1
-	public float scaleSensitivity = 5;
+	public float scaleSensitivity = 10f;
 
 	float deltaX, deltaY, deltaScale;
 	float cachedTime, cachedScroll;
@@ -29,23 +29,24 @@ public class PlayerController : MonoBehaviour {
 		//Button down time;
 		//Test delta in condition block or in Update (directly) count performance;
 
-		ReadAxeInput (ref deltaX, ref deltaY,ref deltaScale);
-
-		if(isAnyInputed()) {
-					cachedTime += Time.deltaTime;					
-					OverviewCamera.Translate (deltaX,deltaY,deltaScale);
-			}
-			
-			if (isRunning && isAnyInputed()) {
+		if(isAnyKeyInputed()) {
+			ReadAxeInput (ref deltaX, ref deltaY,ref deltaScale);
+			cachedTime += Time.deltaTime;					
+			OverviewCamera.Translate (deltaX,deltaY,deltaScale);
+			if (isRunning) {
 				Debug.Log ("STOP COROUTINE RIGHT THERE");
 				StopCoroutine (smoothHelper);
-		}
-			if (isCameraControlEnded()) {
-				smoothHelper = StartCoroutine (SmoothMove (deltaX, deltaY, deltaScale, 2*cachedTime));
-				cachedScale = cachedTime = 0;
-
+				isRunning = false;
 			}
+		}
+
+		if (isCameraControlEnded()) {
+
+			smoothHelper = StartCoroutine (SmoothMove (deltaX, deltaY, cachedScroll*scaleSensitivity, cachedTime));
+			cachedTime = 0;
+		}
 		cachedScroll = deltaScale;
+		deltaScale = 0;
 	}
 
 
@@ -53,8 +54,7 @@ public class PlayerController : MonoBehaviour {
 	//f/Timing - decresing multiplier for impacts
 	IEnumerator SmoothMove(float impactX,float impactY, float impactScale,float Timing) {
 
-		Debug.Log ("Scroll impact is " + impactScale);
-
+		Debug.Log (Timing);
 		float f, m;
 		float frameLength = Time.deltaTime;
 		isRunning = true;
@@ -69,32 +69,28 @@ public class PlayerController : MonoBehaviour {
 			}
 		isRunning = false;
 
-		//Debug.Log ("ENDED");
+		Debug.Log ("ENDED Correctly");
 	}
-	public static bool isAnyKeyDown(){
-		return Input.GetButton ("Horizontal") || Input.GetButton ("Vertical") || Input.GetAxis("Mouse ScrollWheel")!=0;			
+	public static bool isAnyKeyInputed(){
+		return Input.GetButton ("Horizontal") || Input.GetButton ("Vertical") || Input.GetAxis ("Mouse ScrollWheel") != 0;			
+	}
 
 	public bool isCameraControlEnded(){
 
 		return Input.GetButtonUp ("Horizontal") || Input.GetButtonUp ("Vertical") || ScrollEnded ();
-	
 	}
 
-	public bool isAnyInputed(){
-
-		return deltaX!=0 || deltaY!=0 || deltaScale!=0;	
-
-	}
 	private bool ScrollEnded(){
 
 		if ((Input.GetAxis ("Mouse ScrollWheel") == 0) && (cachedScroll != 0))
 			return true;
 		return false;
 	}
+
 	public void ReadAxeInput(ref float x, ref float y, ref float z){
 
 		x = Input.GetAxis ("Horizontal") * Time.deltaTime*speed;
 		y = Input.GetAxis ("Vertical") * Time.deltaTime*speed;
-		z = Input.GetAxis ("Mouse ScrollWheel") * Time.deltaTime*speed*scaleSensitivity;	
+		z = Input.GetAxis ("Mouse ScrollWheel") * Time.deltaTime*speed;	
 	}
 }
