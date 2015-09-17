@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour {
 	public float scaleSensitivity = 5;
 
 	float deltaX,deltaY,deltaScale;
-	float cachedX,cachedY,cachedScale,cachedTime;
+	float cachedScale,cachedTime;
 	public float speed;
 	bool isRunning = false;
 
@@ -27,19 +27,17 @@ public class PlayerController : MonoBehaviour {
 	void Update () {
 
 			//Reading Player input
-			deltaX = Input.GetAxis ("Horizontal") * Time.deltaTime*speed;
-			deltaY = Input.GetAxis ("Vertical") * Time.deltaTime*speed;
-			deltaScale = Input.GetAxis ("Mouse ScrollWheel") * Time.deltaTime*speed*scaleSensitivity;
-			cachedX += deltaX;
-			cachedY += deltaY;
-			cachedScale += deltaScale;
-			
 			//Button down time
 			if (isAnyKeyDown()) {
-					cachedTime += Time.deltaTime;
+				deltaX = Input.GetAxis ("Horizontal") * Time.deltaTime*speed;
+				deltaY = Input.GetAxis ("Vertical") * Time.deltaTime*speed;
+				deltaScale = Input.GetAxis ("Mouse ScrollWheel") * Time.deltaTime*speed*scaleSensitivity;
+				cachedScale += deltaScale;
+				cachedTime += Time.deltaTime;
+				OverviewCamera.Translate (deltaX,deltaY,deltaScale);
 			}
 			
-			OverviewCamera.Translate (deltaX,deltaY,deltaScale);
+			
 			
 			if (isRunning && isAnyKeyDown ()) {
 			//Debug.Log ("STOP COROUTINE RIGHT THERE");
@@ -47,7 +45,7 @@ public class PlayerController : MonoBehaviour {
 		}
 			if (isCameraControlEnded()) {
 				smoothHelper = StartCoroutine (SmoothMove (deltaX, deltaY, deltaScale, 2*cachedTime));
-				cachedX = cachedY = cachedScale = cachedTime = 0;
+				cachedScale = cachedTime = 0;
 
 			}
 		}
@@ -77,6 +75,6 @@ public class PlayerController : MonoBehaviour {
 		return Input.GetButtonUp ("Horizontal") || Input.GetButtonUp ("Vertical") || Input.GetButtonUp ("Mouse ScrollWheel");
 	}
 	public static bool isAnyKeyDown(){
-		return Input.GetButton ("Horizontal") || Input.GetButton ("Vertical") || Input.GetButton ("Mouse ScrollWheel");			
+		return Input.GetButton ("Horizontal") || Input.GetButton ("Vertical") || Input.GetAxis("Mouse ScrollWheel")!=0;			
 	}
 }
