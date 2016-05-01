@@ -4,7 +4,7 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour {
 
-	public Transform OverviewCamera;
+	Transform OverviewCamera;
 
 	//for Sensetivity scrolls = 1
 	public float scaleSensitivity = 10f;
@@ -20,20 +20,22 @@ public class PlayerController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		smoothHelper = null;
+		OverviewCamera = GetComponent<Transform>();
 	}
 
 	// Update is called once per frame
 	void Update () {
-
+		
 		//Reading Player input and any key down;
 		//Button down time;
-		//Test delta in condition block or in Update (directly) count performance;
+		//Check coroutine status;
 
 		if(isAnyKeyInputed()) {
-			ReadAxeInput (ref deltaX, ref deltaY,ref deltaScale);
-			cachedTime += Time.deltaTime;					
-			OverviewCamera.Translate (deltaX,deltaY,deltaScale);
-			if (isRunning) {
+				ReadAxeInput (ref deltaX, ref deltaY,ref deltaScale);
+				cachedTime += Time.deltaTime;					
+				OverviewCamera.Translate (deltaX,deltaY,deltaScale);
+
+		if (isRunning) {
 				Debug.Log ("STOP COROUTINE RIGHT THERE");
 				StopCoroutine (smoothHelper);
 				isRunning = false;
@@ -41,7 +43,6 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		if (isCameraControlEnded()) {
-
 			smoothHelper = StartCoroutine (SmoothMove (deltaX, deltaY, cachedScroll*scaleSensitivity, cachedTime));
 			cachedTime = 0;
 		}
@@ -64,14 +65,16 @@ public class PlayerController : MonoBehaviour {
 			frameLength = Time.deltaTime;
 			m = f/Timing;
 			OverviewCamera.Translate (impactX*m,impactY*m,impactScale*m);
-
 				yield return null;
 			}
 		isRunning = false;
 
+		//Debug information;
 		Debug.Log ("ENDED Correctly");
 	}
+
 	public static bool isAnyKeyInputed(){
+
 		return Input.GetButton ("Horizontal") || Input.GetButton ("Vertical") || Input.GetAxis ("Mouse ScrollWheel") != 0;			
 	}
 

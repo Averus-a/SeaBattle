@@ -6,7 +6,6 @@ public class FieldActivator{
 	private int[,] PlayerField;
 	private BoolMatrix Vision;
 
-
 	public void initFieldsVal(){
 
 		Cartesian Cell;
